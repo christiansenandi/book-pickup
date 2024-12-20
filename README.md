@@ -30,7 +30,7 @@ Dette projekt er et simpelt bookingsystem til at booke en chauffør, hvor bruger
 5. **Start serveren (evt i tmux, screen etc.. den kører i prompt)**
   ```bash
    node server.js
-
+  ```
 ## BUGS
 
 1. opdateringen af chauffør lokation til tracking siden er ikke fantastisk pålidelig... hvis overhovedet...

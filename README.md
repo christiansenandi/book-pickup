@@ -1,10 +1,10 @@
 # book-pickup
-Small project i did for fun... 
+Small project i did for fun... was more to prove i could get it done
 
 
 # Booking System 
 
-Dette projekt er et simpelt bookingsystem til flextrafik, hvor brugere kan udfylde en formular og sende en e-mail med deres bookingdetaljer.
+Dette projekt er et simpelt bookingsystem til at booke en chauffør, hvor brugere kan udfylde en formular og sende en e-mail med deres bookingdetaljer.
 
 ## Funktionalitet
 
@@ -30,3 +30,7 @@ Dette projekt er et simpelt bookingsystem til flextrafik, hvor brugere kan udfyl
 5. **Start serveren (evt i tmux, screen etc.. den kører i prompt)**
   ```bash
    node server.js
+
+## BUGS
+
+1. opdateringen af chauffør lokation til tracking siden er ikke fantastisk pålidelig... hvis overhovedet...

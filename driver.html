@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Location</title>
+  <script>
+    // Function to send location to the backend
+    function sendLocationToServer(lat, lon) {
+      fetch('http://localhost:3000/update-driver-location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ latitude: lat, longitude: lon }),
+      })
+      .then(response => response.json())
+      .catch(error => console.error('Error sending location:', error));
+    }
+
+    // Get the driver's current location every 5 seconds
+    setInterval(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          sendLocationToServer(lat, lon); // Send location to the server
+        });
+      }
+    }, 5000); // 5 seconds interval
+  </script>
+</head>
+<body>
+  <h2>Driver Location Tracking</h2>
+  <p>Your location is being sent to the server every 5 seconds.</p>
+</body>
+</html>

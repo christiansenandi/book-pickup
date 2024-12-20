@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Driver</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .tracking-container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    #map {
+      height: 400px;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="tracking-container">
+    <h2>Følg din Chauffør!</h2>
+    <div id="map"></div>
+    <p>Du kan følge med i din chaufførs lokation her!</p>
+  </div>
+
+  <!-- Leaflet JavaScript Library -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+  // Check if a stored location exists in localStorage
+  const storedLocation = localStorage.getItem('driverLocation');
+  let initialLat = 55.858252; // Fallback static latitude
+  let initialLon = 9.854232; // Fallback static longitude
+
+  if (storedLocation) {
+    // If a stored location exists, parse it and use it as the initial location
+    const locationData = JSON.parse(storedLocation);
+    initialLat = locationData.lat;
+    initialLon = locationData.lon;
+  }
+
+  // Initialize the map with the stored or fallback location
+  const map = L.map('map').setView([initialLat, initialLon], 13);
+
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Function to set the driver's location
+  function setDriverLocation(lat, lon) {
+    // Remove existing marker if there is one
+    if (window.driverMarker) {
+      window.driverMarker.remove();
+    }
+
+    // Add new marker for driver location
+    window.driverMarker = L.marker([lat, lon]).addTo(map)
+      .bindPopup('Sidste opdaterede lokation')
+      .openPopup();
+
+    // Set the map view to the driver's location
+    map.setView([lat, lon], 13);
+
+    // Store the new location in localStorage for next reload
+    localStorage.setItem('driverLocation', JSON.stringify({ lat: lat, lon: lon }));
+  }
+
+  // Use the browser's geolocation API to get the user's current location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const userLat = position.coords.latitude;
+      const userLon = position.coords.longitude;
+      setDriverLocation(userLat, userLon); // Update with the real-time location of the device
+    }, function(error) {
+      console.log("Error fetching location: ", error);
+    });
+  } else {
+    console.log("Geolocation not supported by this browser.");
+  }
+
+  // Optional: Reload page every 5 seconds (if needed for testing)
+  setInterval(function() {
+    location.reload(); // This will reload the page
+  }, 5000);
+</script>
+
+
+</body>
+</html>

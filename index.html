@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chauffør Bestilling</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .booking-container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      text-align: left;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    input[type="tel"] {
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .confirmation {
+      margin-top: 20px;
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    #map {
+      height: 300px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="booking-container">
+    <h2>Bestil Chauffør</h2>
+    <form id="booking-form">
+      <label for="name">Navn:</label>
+      <input type="text" id="name" required>
+
+      <label for="pickup-location">Afhentningssted:</label>
+      <input type="text" id="pickup-location" placeholder="Klik på kortet for at vælge adresse" required>
+
+      <div id="map"></div>
+
+      <label for="phone-number">Telefonnummer:</label>
+      <input type="tel" id="phone-number" required>
+
+      <label for="pickup-date">Afhentnings Dato:</label>
+      <input type="date" id="pickup-date" required>
+
+      <label for="pickup-time">Afhentnings Tidspunkt:</label>
+      <input type="time" id="pickup-time" required>
+
+      <button type="submit">Bekræft bestilling</button>
+    </form>
+
+    <p id="confirmation-message" class="confirmation" style="display: none;">Din bestilling er sendt!</p>
+  </div>
+
+  <!-- Leaflet JavaScript Library -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+  <script>
+    // Initialize the map centered on Copenhagen
+    const map = L.map('map').setView([55.858252, 9.854232], 13);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    let marker;
+
+    // Event listener for map clicks
+    map.on('click', function(e) {
+      if (marker) {
+        marker.remove();
+      }
+      marker = L.marker(e.latlng).addTo(map);
+
+      // Reverse geocoding using Nominatim
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('pickup-location').value = data.display_name;
+        })
+        .catch(error => {
+          console.error('Error with reverse geocoding:', error);
+          document.getElementById('pickup-location').value = 'Kunne ikke finde adresse';
+        });
+    });
+
+      document.getElementById('booking-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Collect form data
+      const formData = {
+        name: document.getElementById('name').value,
+        pickupLocation: document.getElementById('pickup-location').value,
+        phoneNumber: document.getElementById('phone-number').value,
+        date: document.getElementById('pickup-date').value,
+        time: document.getElementById('pickup-time').value,
+      };
+
+      // Send the data to the server
+      fetch('/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => {
+        if (response.ok) {
+          document.getElementById('confirmation-message').style.display = 'block';
+        //  document.getElementById('booking-form').reset();
+// Forward to driver page after a short delay
+    setTimeout(() => {
+      window.location.href = 'track-driver.html';
+    }, 1500);
+        } else {
+          alert('Der opstod en fejl ved bestillingen.');
+        }
+      })
+      .catch(error => {
+        console.error('Fejl:', error);
+        alert('Der opstod en fejl ved bestillingen.');
+      });
+    });
+
+
+  </script>
+
+</body>
+</html>

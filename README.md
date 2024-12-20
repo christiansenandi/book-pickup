@@ -1,4 +1,4 @@
-# book-pickup
+# pickup-booking written in HTML and JavaScript
 Small project i did for fun... was more to prove i could get it done
 
 # Free to use...

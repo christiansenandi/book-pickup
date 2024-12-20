@@ -26,3 +26,7 @@ Dette projekt er et simpelt bookingsystem til flextrafik, hvor brugere kan udfyl
    ```bash
    git clone <repository-url>
    cd <projekt-mappe>
+4. **placer html filer i /usr/shared/nginx/html/ hvis du bruger nginx og genstart servicen**
+5. **Start serveren (evt i tmux, screen etc.. den kører i prompt)**
+  ```bash
+   node server.js
